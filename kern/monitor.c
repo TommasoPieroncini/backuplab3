@@ -11,6 +11,9 @@
 #include <kern/monitor.h>
 #include <kern/kdebug.h>
 
+//INCLUDED for LAB2 CHALLENGE
+#include <kern/pmap.h>
+
 #define CMDBUF_SIZE 80 // enough for one VGA text line
 
 
@@ -24,6 +27,9 @@ struct Command {
 static struct Command commands[] = {
   { "help",      "Display this list of commands",        mon_help       },
   { "info-kern", "Display information about the kernel", mon_infokern   },
+  { "showmappings", "Display information about physical page mappings", mon_showmappings },
+  { "flagset", "Change permission flags for a physical page", mon_flagset },
+  { "dumpmem", "Show contents of memory in specified range", mon_dumpmem }
 };
 #define NCOMMANDS (sizeof(commands)/sizeof(commands[0]))
 
@@ -71,6 +77,91 @@ mon_backtrace(int argc, char **argv, struct Trapframe *tf)
     ebp = (int*) *ebp;
   }
   return 0;
+}
+
+// CHALLENGE FOR LAB2 - Extend JOS kernel monitor commands
+
+int
+mon_showmappings(int argc, char **argv, struct Trapframe *tf)
+{
+  if (argc < 3) {
+    cprintf("Use: showmappings 0xstart 0xend\n");
+    return 0;
+  }
+  uint32_t start = xtoi(argv[1]);
+  uint32_t end = xtoi(argv[2]);
+  for (; start <= end; start += PGSIZE) {
+    pte_t *pte = pgdir_walk(kern_pgdir, (void *) start, 1);
+    if (!pte) {
+      panic("Can't create page, out of memory");
+    }
+    if (*pte & PTE_P) {
+      cprintf("Page at %x. Flags: PTE_P: %x, PTE_U: %x, PTE_W: %x\n", start, *pte & PTE_P, *pte & PTE_U, *pte & PTE_W);
+    } else {
+      cprintf("Page at %x does not exist.\n", start);
+    }
+  }
+  return 0;
+}
+
+int
+mon_flagset(int argc, char **argv, struct Trapframe *tf)
+{
+  if (argc < 4) {
+    cprintf("Use: flagset P/U/W 1/0 0xaddress\n");
+    return 0;
+  }
+  char argf = *argv[1];
+  int flag = 0;
+  if (argf == 'P') {
+    flag = PTE_P;
+  } else if (argf == 'U') {
+    flag = PTE_U;
+  } else if (argf == 'W') {
+    flag = PTE_W;
+  }
+  char set = *argv[2];
+  uint32_t address = xtoi(argv[3]);
+  pte_t *pte = pgdir_walk(kern_pgdir, (void *) address, 1);
+  cprintf("Page at %x. Flags: PTE_P: %x, PTE_U: %x, PTE_W: %x\n", address, *pte & PTE_P, *pte & PTE_U, *pte & PTE_W);
+  if (set == '1') {
+    *pte = *pte | flag;
+  } else {
+    *pte = *pte & ~flag;
+  }
+  cprintf("Modified flag. %d %d\n", flag);
+  cprintf("Page at %x. Flags: PTE_P: %x, PTE_U: %x, PTE_W: %x\n", address, *pte & PTE_P, *pte & PTE_U, *pte & PTE_W);
+  return 0;
+}
+
+int
+mon_dumpmem(int argc, char **argv, struct Trapframe *tf)
+{
+  if (argc < 3) {
+    cprintf("Use: dumpmem 0xstart 0xrange\n");
+    return 0;
+  }
+  void** start = (void **) xtoi(argv[1]);
+  uint32_t range = xtoi(argv[2]);
+  for (int x = 0; x < range; x++) {
+    cprintf("Memory contents at %x: %x\n", start + x, start[x]);
+  }
+  return 0;
+}
+
+uint32_t
+xtoi(char *x) {
+  uint32_t res = 0;
+  x += 2;
+  while (*x) {
+    if (*x >= 'a') {
+      *x = *x - 'a' + '0' + 10;
+    }
+    res = res * 16 + *x - '0';
+    x++;
+  }
+  //cprintf("Test %d", res);
+  return res;
 }
 
 

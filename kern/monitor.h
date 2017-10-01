@@ -16,5 +16,9 @@ int mon_help(int argc, char **argv, struct Trapframe *tf);
 int mon_infokern(int argc, char **argv, struct Trapframe *tf);
 int mon_infopg(int argc, char **argv, struct Trapframe *tf);
 int mon_backtrace(int argc, char **argv, struct Trapframe *tf);
+int mon_showmappings(int argc, char **argv, struct Trapframe *tf);
+int mon_flagset(int argc, char **argv, struct Trapframe *tf);
+int mon_dumpmem(int argc, char **argv, struct Trapframe *tf);
+uint32_t xtoi(char *x);
 
 #endif  // !JOS_KERN_MONITOR_H
