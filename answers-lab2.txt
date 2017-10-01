@@ -5,3 +5,17 @@ Answers to questions:
 4. 2GB. Since the size of a struct pageinfo is 8 bytes and the size of the UPAGES portion of memory is maximum 4MB, the total number of pages is 4MB/8B = 512 K pages. 4K size of page * 512K = 2GB of physical memory mapped at any time.
 5. 4K for the page directory plus 2MB for page tables and 4MB of PageInfo structs, for a total of 6MB and 4KB of overhead memory usage.
 6. We transition after a jump to $relocated (jmp *%eax instruction). It is still possible to execute with a lower EIP because the physical locations [0,4MB) are mapped directly to virtual addresses [0, 4MB). This change is necessary, because soon the pgdir is loaded and will break the [0, 4MB) mapping.
+
+CHALLENGE:
+Completed challenge 
+"Challenge! Extend the JOS kernel monitor with commands to:
+
+Display in a useful and easy-to-read format all of the physical page mappings (or lack thereof) that apply to a particular range of virtual/linear addresses in the currently active address space. For example, you might enter 'showmappings 0x3000 0x5000' to display the physical page mappings and corresponding permission bits that apply to the pages at virtual addresses 0x3000, 0x4000, and 0x5000.
+Explicitly set, clear, or change the permissions of any mapping in the current address space.
+Dump the contents of a range of memory given either a virtual or physical address range. Be sure the dump code behaves correctly when the range extends across page boundaries!
+Do anything else that you think might be useful later for debugging the kernel. (There’s a good chance it will be!)"
+
+New functions in kern/monitor.c
+showmappings
+flagset
+dumpmem
