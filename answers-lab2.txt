@@ -1,3 +1,7 @@
 Answers to questions:
 1. uintptr_t
-
+2. Uploaded image of table
+3. Because the page table entries have permissions set and so does every page. (if PTE_U is not set, user is not able to write or read from the page).
+4. 2GB. Since the size of a struct pageinfo is 8 bytes and the size of the UPAGES portion of memory is maximum 4MB, the total number of pages is 4MB/8B = 512 K pages. 4K size of page * 512K = 2GB of physical memory mapped at any time.
+5. 4K for the page directory plus 2MB for page tables and 4MB of PageInfo structs, for a total of 6MB and 4KB of overhead memory usage.
+6. We transition after a jump to $relocated (jmp *%eax instruction). It is still possible to execute with a lower EIP because the physical locations [0,4MB) are mapped directly to virtual addresses [0, 4MB). This change is necessary, because soon the pgdir is loaded and will break the [0, 4MB) mapping.

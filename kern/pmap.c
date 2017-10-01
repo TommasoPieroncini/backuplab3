@@ -176,6 +176,7 @@ mem_init(void)
   //      (ie. perm = PTE_U | PTE_P)
   //    - pages itself -- kernel RW, user NONE
   // Your code goes here:
+  cprintf("Mapping pages (page directory) at va: %x and pa: %x. Size: %x\n", UPAGES, PADDR(pages), PTSIZE);
   boot_map_region(kern_pgdir, UPAGES, PTSIZE, PADDR(pages), PTE_U);
 
   //////////////////////////////////////////////////////////////////////
@@ -189,6 +190,7 @@ mem_init(void)
   //       overwrite memory.  Known as a "guard page".
   //     Permissions: kernel RW, user NONE
   // Your code goes here:
+  cprintf("Mapping bootstack (kernel stack) at va: %0x and pa: %0x. Size: %0x\n", KSTACKTOP - KSTKSIZE, PADDR(bootstack), KSTKSIZE);
   boot_map_region(kern_pgdir, KSTACKTOP - KSTKSIZE, KSTKSIZE, PADDR(bootstack), PTE_W);
 
   //////////////////////////////////////////////////////////////////////
@@ -199,9 +201,12 @@ mem_init(void)
   // we just set up the mapping anyway.
   // Permissions: kernel RW, user NONE
   // Your code goes here:
+  cprintf("Mapping phys memory at va: %x and pa: %x. Size: %x\n", KERNBASE, 0, -KERNBASE);
+  panic("Print");
   boot_map_region(kern_pgdir, KERNBASE, -KERNBASE, 0, PTE_W);
 
   // Check that the initial page directory has been set up correctly.
+  panic("TEST\n");
   check_kern_pgdir();
 
   // Switch from the minimal entry page directory to the full kern_pgdir
