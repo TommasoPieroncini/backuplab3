@@ -176,7 +176,7 @@ mem_init(void)
   //      (ie. perm = PTE_U | PTE_P)
   //    - pages itself -- kernel RW, user NONE
   // Your code goes here:
-  cprintf("Mapping pages (page directory) at va: %x and pa: %x. Size: %x\n", UPAGES, PADDR(pages), PTSIZE);
+  //cprintf("Mapping pages (page directory) at va: %x and pa: %x. Size: %x\n", UPAGES, PADDR(pages), PTSIZE);
   boot_map_region(kern_pgdir, UPAGES, PTSIZE, PADDR(pages), PTE_U);
 
   //////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ mem_init(void)
   //       overwrite memory.  Known as a "guard page".
   //     Permissions: kernel RW, user NONE
   // Your code goes here:
-  cprintf("Mapping bootstack (kernel stack) at va: %0x and pa: %0x. Size: %0x\n", KSTACKTOP - KSTKSIZE, PADDR(bootstack), KSTKSIZE);
+  //cprintf("Mapping bootstack (kernel stack) at va: %0x and pa: %0x. Size: %0x\n", KSTACKTOP - KSTKSIZE, PADDR(bootstack), KSTKSIZE);
   boot_map_region(kern_pgdir, KSTACKTOP - KSTKSIZE, KSTKSIZE, PADDR(bootstack), PTE_W);
 
   //////////////////////////////////////////////////////////////////////
@@ -201,12 +201,10 @@ mem_init(void)
   // we just set up the mapping anyway.
   // Permissions: kernel RW, user NONE
   // Your code goes here:
-  cprintf("Mapping phys memory at va: %x and pa: %x. Size: %x\n", KERNBASE, 0, -KERNBASE);
-  panic("Print");
+  //cprintf("Mapping phys memory at va: %x and pa: %x. Size: %x\n", KERNBASE, 0, -KERNBASE);
   boot_map_region(kern_pgdir, KERNBASE, -KERNBASE, 0, PTE_W);
 
   // Check that the initial page directory has been set up correctly.
-  panic("TEST\n");
   check_kern_pgdir();
 
   // Switch from the minimal entry page directory to the full kern_pgdir
@@ -270,7 +268,6 @@ page_init(void)
     page_free_list = &pages[i];
   }
   char *start_of_free_mem = (char *) boot_alloc(0);
-  //int med = (int) ROUNDUP(((char*) pages) + (sizeof(struct PageInfo) *npages) - 0xf0000000, PGSIZE) / PGSIZE;
   for (i = (int) PADDR(start_of_free_mem) / PGSIZE; i < npages; i++) {
     pages[i].pp_ref = 0;
     pages[i].pp_link = page_free_list;
