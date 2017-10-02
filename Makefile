@@ -196,6 +196,7 @@ distclean: realclean
 	rm -rf conf/gcc.mk
 
 ifneq ($(V),@)
+LAB = 1
 GRADEFLAGS += -v
 endif
 
