@@ -116,7 +116,13 @@ env_init(void)
 {
   // Set up envs array
   // LAB 3: Your code here.
-
+  for (int i = NENV - 1; i >= 0; i--) {
+    struct Env *curr = envs + i;
+    curr->env_status = ENV_FREE;
+    curr->env_id = 0;
+    curr->env_link = env_free_list;
+    env_free_list = curr;
+  } 
   // Per-CPU part of the initialization
   env_init_percpu();
 }
@@ -180,6 +186,14 @@ env_setup_vm(struct Env *e)
   //    - The functions in kern/pmap.h are handy.
 
   // LAB 3: Your code here.
+  p->pp_ref++;
+  e->env_pgdir = (pde_t*) p;
+  for (int i = UTOP; i < ULIM; i += PGSIZE) {
+    if (i != UVPT) {
+      pde_t *pde = pgdir_walk(e->env_pgdir, (void *) i, 1);
+      e->env_pgdir[PDX(i)] = PADDR(pde) | PTE_P | PTE_U | PTE_W;
+    }
+  }
 
   // UVPT maps the env's own page table read-only.
   // Permissions: kernel R, user R
@@ -266,6 +280,12 @@ region_alloc(struct Env *e, void *va, size_t len)
   //   'va' and 'len' values that are not page-aligned.
   //   You should round va down, and round (va + len) up.
   //   (Watch out for corner-cases!)
+  if (len == 0) {
+    return va;
+  }
+  va = ROUNDDOWN(va, PGSIZE);
+  void *end = ROUNDUP(va + len, PGSIZE);
+  
 }
 
 //
