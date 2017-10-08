@@ -66,6 +66,38 @@ trap_init(void)
 
 
   // LAB 3: Your code here.
+  void h0();
+  void h1();
+  void h2();
+  void h3();
+  void h4();
+  void h5();
+  void h6();
+  void h7();
+  void h8();
+  void h9();
+  void h10();
+  void h11();
+  void h12();
+  void h13();
+  void h14();
+  void h16();
+  SETGATE(idt[0], 0, GD_KT, h0, 0);
+  SETGATE(idt[1], 0, GD_KT, h1, 0);
+  SETGATE(idt[2], 0, GD_KT, h2, 0);
+  SETGATE(idt[3], 0, GD_KT, h3, 0);
+  SETGATE(idt[4], 0, GD_KT, h4, 0);
+  SETGATE(idt[5], 0, GD_KT, h5, 0);
+  SETGATE(idt[6], 0, GD_KT, h6, 0);
+  SETGATE(idt[7], 0, GD_KT, h7, 0);
+  SETGATE(idt[8], 0, GD_KT, h8, 0);
+  SETGATE(idt[9], 0, GD_KT, h9, 0);
+  SETGATE(idt[10], 0, GD_KT, h10, 0);
+  SETGATE(idt[11], 0, GD_KT, h11, 0);
+  SETGATE(idt[12], 0, GD_KT, h12, 0);
+  SETGATE(idt[13], 0, GD_KT, h13, 0);
+  SETGATE(idt[14], 0, GD_KT, h14, 0);
+  SETGATE(idt[16], 0, GD_KT, h16, 0);
 
   // Per-CPU setup
   trap_init_percpu();
