@@ -187,7 +187,7 @@ env_setup_vm(struct Env *e)
 
   // LAB 3: Your code here.
   p->pp_ref++;
-  e->env_pgdir = (pde_t*) page2kva(p);
+  e->env_pgdir = page2kva(p);
   memcpy(e->env_pgdir, kern_pgdir, PGSIZE);
 
   // UVPT maps the env's own page table read-only.
@@ -275,11 +275,13 @@ region_alloc(struct Env *e, void *va, size_t len)
   //   'va' and 'len' values that are not page-aligned.
   //   You should round va down, and round (va + len) up.
   //   (Watch out for corner-cases!)
-  if (len == 0) {
+  
+
+  if (len <= 0) {
     return;
   }
-  va = ROUNDDOWN(va, PGSIZE);
   void *end = ROUNDUP(va + len, PGSIZE);
+  va = ROUNDDOWN(va, PGSIZE);
   
   while (va < end)
   {
@@ -398,7 +400,7 @@ env_create(uint8_t *binary, enum EnvType type)
   if (env_alloc(&newenv, 0) == 0)
   {
     load_icode(newenv, binary);
-    newenv->env_type = ENV_TYPE_USER;
+    newenv->env_type = type;
   }
 }
 
@@ -515,18 +517,19 @@ env_run(struct Env *e)
   //	e->env_tf to sensible values.
 
   // LAB 3: Your code here.
-  if (curenv != NULL) {
-    if (curenv->env_status == ENV_RUNNING) {
-      curenv->env_status = ENV_RUNNABLE;
-    }
+  if (curenv != e) {
+	  if (curenv != NULL) {
+		  if (curenv->env_status == ENV_RUNNING) {
+			  curenv->env_status = ENV_RUNNABLE;
+		  }
+	  }
+	  curenv = e;
+	  curenv->env_status = ENV_RUNNING;
+	  curenv->env_runs++;
+
+	  lcr3(PADDR(curenv->env_pgdir));
+
   }
-  curenv = e;
-  curenv->env_status = ENV_RUNNING;
-  curenv->env_runs++;
-
-  lcr3(PADDR(curenv->env_pgdir));
-
-  env_pop_tf(&(curenv->env_tf));
-
+	env_pop_tf(&curenv->env_tf);
 }
 
